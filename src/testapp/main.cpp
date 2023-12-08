@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#include <filesystem>
 #include <iostream>
 #include <unistd.h>
 
@@ -37,23 +38,14 @@
 using namespace testapp;
 using namespace realm;
 
-void usage(const std::shared_ptr<util::Logger> &logger)
-{
-    logger->info("usage: qnxdemo [-h] [command] [sync]");
-    logger->info("QNX Demo - display and add data to the realm database");
-    logger->info("Command:");
-    logger->info(" add1        - add the first set of people to the database");
-    logger->info(" add2        - add the second set of people to the database");
-    logger->info(" add3        - add the third set of people to the database");
-    logger->info(" createuser  - create a user in the cloud app");
-    logger->info(" sync        - sync the realm contents with the cloud app");
-}
-
 std::string get_path()
 {
-    char buff[256];
-    //auto path = std::string(getcwd(buff, 256));
-    return "/Users/michael.wilkersonbarker/Dev/test-app/data";
+    std::string path = std::filesystem::current_path();
+    path += "/data";
+    if (!std::filesystem::exists(path)) {
+        std::filesystem::create_directory(path);
+    }
+    return path;
 }
 
 auto create_app_config()
@@ -112,7 +104,7 @@ Status wait_for_upload_completion(const std::shared_ptr<SyncSession> &session,
     session->wait_for_upload_completion(
         [promise = util::CopyablePromiseHolder<void>(std::move(u_promise)), logger](Status status) mutable {
         if (!status.is_ok()) {
-            logger->error("failed to download: %1", status.reason());
+            logger->error("failed to upload: %1", status.reason());
             promise.get_promise().set_error(status);
         }
         promise.get_promise().emplace_value();
