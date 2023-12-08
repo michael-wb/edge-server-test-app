@@ -1,0 +1,4 @@
+[submodule "realm-core"]
+	path = realm-core
+	url = git@github.com:realm/realm-core.git
+	branch = mwb/update-baseurl
