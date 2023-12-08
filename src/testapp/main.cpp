@@ -189,7 +189,6 @@ bool do_realm_sync(const std::string& email, const std::string& password,
                 }
             }
         }
-        app->sync_manager()->wait_for_sessions_to_terminate();
         if (result.is_ok() && (!sync_result || sync_result->is_ok())) {
             return true;
         }
